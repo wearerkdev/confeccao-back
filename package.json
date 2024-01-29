@@ -12,6 +12,7 @@
     "start:dev": "nodemon -r dotenv/config src/index.js",
     "migrate:up": "npx sequelize-cli db:migrate",
     "migrate:undo": "npx sequelize-cli db:migrate:undo",
+    "migration:create": "npx sequelize-cli model:generate --name ${nome} --attributes ${attr}",
     "docker:run": "docker compose -p confeccao-back -f docker-compose.yml up",
     "docker:build": "docker compose -p confeccao-back -f docker-compose.yml up --build",
     "docker:down": "docker compose down",
@@ -32,5 +33,8 @@
   "devDependencies": {
     "nodemon": "^3.0.3",
     "sequelize-cli": "^6.6.2"
+  },
+  "engines": {
+    "node": ">=20.10.0"
   }
 }
