@@ -4,16 +4,33 @@
   "main": "index.js",
   "repository": "https://github.com/wearerkdev/confeccao-back.git",
   "license": "MIT",
+  "author": {
+    "email": "we.are.rkdev@gmail.com",
+    "name": "We are RK Dev"
+  },
+  "scripts": {
+    "start:dev": "nodemon -r dotenv/config src/index.js",
+    "migrate:up": "npx sequelize-cli db:migrate",
+    "migrate:undo": "npx sequelize-cli db:migrate:undo",
+    "docker:run": "docker compose -p confeccao-back -f docker-compose.yml up",
+    "docker:build": "docker compose -p confeccao-back -f docker-compose.yml up --build",
+    "docker:down": "docker compose down",
+    "docker:stop": "docker compose stop",
+    "docker:start": "docker compose start",
+    "docker:del": "docker system prune --all --volumes --force"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.1",
     "express": "^4.18.2",
+    "helmet": "^7.1.0",
     "hpp": "^0.2.3",
     "mysql2": "^3.9.1",
     "sequelize": "^6.35.2",
     "xss": "^1.0.14"
   },
   "devDependencies": {
-    "nodemon": "^3.0.3"
+    "nodemon": "^3.0.3",
+    "sequelize-cli": "^6.6.2"
   }
 }
