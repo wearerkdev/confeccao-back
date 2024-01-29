@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "target": "ES2022",
+    "module": "commonjs",
+    "paths": {
+      "@/*": ["src/*"],
+      "@controllers/*": ["controllers/*"],
+      "@routes/*": ["src/routes/*"],
+      "@models/*": ["src/database/models/*"]
+    }
+  },
+  "exclude": ["node_modules"]
+}
