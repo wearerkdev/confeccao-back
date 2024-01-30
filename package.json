@@ -10,9 +10,10 @@
   },
   "scripts": {
     "start:dev": "nodemon -r dotenv/config src/index.js",
+    "migration:create": "npx sequelize-cli migration:create --name ${name}",
     "migrate:up": "npx sequelize-cli db:migrate",
     "migrate:undo": "npx sequelize-cli db:migrate:undo",
-    "migration:create": "npx sequelize-cli model:generate --name ${nome} --attributes ${attr}",
+    "model:create": "npx sequelize-cli model:generate --name ${name} --attributes user:string",
     "docker:run": "docker compose -p confeccao-back -f docker-compose.yml up",
     "docker:build": "docker compose -p confeccao-back -f docker-compose.yml up --build",
     "docker:down": "docker compose down",
