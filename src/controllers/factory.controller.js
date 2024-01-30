@@ -144,10 +144,44 @@ const updateFactory = async (request, response, next) => {
   }
 };
 
+const deleteOneFactory = async (request, response, next) => {
+  try {
+    const { id } = request.params;
+    const findFactory = await models.Factories.findByPk(id);
+
+    if (!id) {
+      return response.status(400).json({
+        message: 'Precisa informar id da confecção.',
+      });
+    }
+
+    if (!findFactory) {
+      return response.status(404).json({
+        message: `Confecção com id ${id} não foi encontrada. Tem certeza que é o id correto?`,
+      });
+    }
+
+    const factoryToDelete = await models.Factories.destroy({
+      where: { id },
+    });
+
+    return response.status(200).json({
+      message: 'Confecção excluída com sucesso',
+      factoryToDelete,
+    });
+  } catch (error) {
+    next(error);
+    return response.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   addNewFactory,
   findFactoryByID,
   findAllFactories,
   findPerStatus,
   updateFactory,
+  deleteOneFactory,
 };
