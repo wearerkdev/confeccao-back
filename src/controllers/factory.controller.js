@@ -66,7 +66,34 @@ const findFactoryByID = async (request, response, next) => {
   }
 };
 
+const findAllFactories = async (request, response, next) => {
+  try {
+    const listAllFactories = await models.Factories.findAndCountAll({
+      attributes: [
+        'id',
+        'factoryID',
+        'name',
+        'phoneNumber',
+        'observation',
+        'status',
+      ],
+    });
+    // const count = await models.Factories.
+
+    return response.json({
+      message: 'List da todas as confecções',
+      listAllFactories,
+    });
+  } catch (error) {
+    next(error);
+    return response.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   addNewFactory,
   findFactoryByID,
+  findAllFactories,
 };
