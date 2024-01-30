@@ -52,7 +52,24 @@ const findSegmentByID = async (request, response, next) => {
   }
 };
 
+const findAllSegments = async (request, response, next) => {
+  try {
+    const listAllSegments = await models.Segments.findAndCountAll();
+
+    return response.json({
+      message: 'Listagem de todos os segmentos',
+      listAllSegments,
+    });
+  } catch (error) {
+    next(error);
+    return response.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   addNewSegment,
   findSegmentByID,
+  findAllSegments,
 };
