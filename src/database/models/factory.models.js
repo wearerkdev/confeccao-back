@@ -30,14 +30,35 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(11),
         allowNull: true,
       },
+      isNumberWhatsapp: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
       observation: {
         type: DataTypes.TEXT,
         allowNull: true,
       },
       status: {
         type: DataTypes.ENUM,
-        values: ['pending', 'done', 'ongoing'],
-        defaultValue: 'pending',
+        values: ['costurando', 'costurado', 'todos'],
+        defaultValue: 'costurando',
+        allowNull: true,
+      },
+      saidaParaCostura: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
+      quantidadeSaida: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      retiradaDaCostura: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
+      quantidadeRetorno: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
       },
     },
     {

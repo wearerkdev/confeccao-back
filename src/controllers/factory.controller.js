@@ -11,9 +11,8 @@ const addNewFactory = async (request, response, next) => {
     }
 
     const progress = Object.freeze({
-      DONE: 'done',
-      PENDING: 'pending',
-      ONGOING: 'ongoing',
+      DONE: 'costurado',
+      PENDING: 'costurando',
     });
 
     if (!Object.values(progress).includes(status)) {
@@ -92,6 +91,12 @@ const findAllFactories = async (request, response, next) => {
 const findPerStatus = async (request, response, next) => {
   try {
     const { status } = request.query;
+
+    if (status === 'todos') {
+      return response.json({
+        status: await models.Factories.findAll(),
+      });
+    }
 
     const findFactoriesPerStatus = await models.Factories.findAll({
       where: { status },

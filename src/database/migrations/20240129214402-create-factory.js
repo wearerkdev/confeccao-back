@@ -22,21 +22,47 @@ module.exports = {
       phoneNumber: {
         type: Sequelize.STRING(11),
       },
+      isNumberWhatsapp: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
       observation: {
         type: Sequelize.TEXT,
+        allowNull: true,
       },
       status: {
         type: Sequelize.ENUM,
-        values: ['pending', 'done', 'ongoing'],
-        defaultValue: 'pending',
+        values: ['costurando', 'costurado', 'todos'],
+        defaultValue: 'costurando',
+        allowNull: true,
+      },
+      saidaParaCostura: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      saidaParaCostura: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      quantidadeSaida: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      retiradaDaCostura: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      quantidadeRetorno: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
       },
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE,
+        allowNull: false,
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE,
+        allowNull: false,
       },
     });
   },
