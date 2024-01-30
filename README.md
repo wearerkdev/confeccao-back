@@ -3,6 +3,7 @@
 ## Pequeno dicionario
 
 - factory é confecção, apenas mudado para não ter problemas de acentuação
+- segment é segmento, apenas para manter consistência em inglês
 
 # Como criar migrations?
 

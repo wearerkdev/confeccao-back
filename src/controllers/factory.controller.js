@@ -47,8 +47,6 @@ const findFactoryByID = async (request, response, next) => {
     const { id } = request.params;
     const factory = await models.Factories.findOne({ where: { id } });
 
-    console.log(factory);
-
     if (!id) {
       return response.json({
         message: `Confecção com id ${id} não foi encontrada.`,
@@ -78,7 +76,6 @@ const findAllFactories = async (request, response, next) => {
         'status',
       ],
     });
-    // const count = await models.Factories.
 
     return response.json({
       message: 'List da todas as confecções',
@@ -92,8 +89,25 @@ const findAllFactories = async (request, response, next) => {
   }
 };
 
+const findPerStatus = async (request, response, next) => {
+  try {
+    const { status } = request.query;
+
+    const findFactoriesPerStatus = await models.Factories.findAll({
+      where: { status },
+    });
+    return response.json({
+      status,
+      findFactoriesPerStatus,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   addNewFactory,
   findFactoryByID,
   findAllFactories,
+  findPerStatus,
 };
