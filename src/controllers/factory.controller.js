@@ -42,6 +42,31 @@ const addNewFactory = async (request, response, next) => {
   }
 };
 
+const findFactoryByID = async (request, response, next) => {
+  try {
+    const { id } = request.params;
+    const factory = await models.Factories.findOne({ where: { id } });
+
+    console.log(factory);
+
+    if (!id) {
+      return response.json({
+        message: `Confecção com id ${id} não foi encontrada.`,
+      });
+    }
+
+    return response.json({
+      factory,
+    });
+  } catch (error) {
+    next(error);
+    return response.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   addNewFactory,
+  findFactoryByID,
 };
