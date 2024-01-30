@@ -7,5 +7,6 @@ factoryRouter.post('/nova', factoryController.addNewFactory);
 factoryRouter.get('/encontrarpor/:id', factoryController.findFactoryByID);
 factoryRouter.get('/todas', factoryController.findAllFactories);
 factoryRouter.get('/status/', factoryController.findPerStatus);
+factoryRouter.put('/atualizar/:id', factoryController.updateFactory);
 
 module.exports = factoryRouter;

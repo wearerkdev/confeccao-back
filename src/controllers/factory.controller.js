@@ -44,9 +44,9 @@ const addNewFactory = async (request, response, next) => {
 const findFactoryByID = async (request, response, next) => {
   try {
     const { id } = request.params;
-    const factory = await models.Factories.findOne({ where: { id } });
+    const factory = await models.Factories.findByPk(id);
 
-    if (!id) {
+    if (!factory) {
       return response.json({
         message: `Confecção com id ${id} não foi encontrada.`,
       });
@@ -107,6 +107,40 @@ const findPerStatus = async (request, response, next) => {
     });
   } catch (error) {
     next(error);
+    return response.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
+const updateFactory = async (request, response, next) => {
+  try {
+    const { id } = request.params;
+    const factory = await models.Factories.findByPk(id);
+
+    if (!factory) {
+      return response.json({
+        message: `Confecção com id ${id} não foi encontrada.`,
+      });
+    }
+
+    const updateData = await models.Factories.update(
+      { ...request.body },
+      {
+        where: {
+          id,
+        },
+      },
+    );
+
+    return response.status(200).json({
+      message: 'Dados da confecção foram atualizados',
+    });
+  } catch (error) {
+    next(error);
+    return response.status(500).json({
+      error: error.message,
+    });
   }
 };
 
@@ -115,4 +149,5 @@ module.exports = {
   findFactoryByID,
   findAllFactories,
   findPerStatus,
+  updateFactory,
 };
