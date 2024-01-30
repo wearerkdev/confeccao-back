@@ -2,23 +2,33 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Segmento', {
+    await queryInterface.createTable('Factories', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      segmentoID: {
+      factoryID: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
       },
-      segmentoNome: {
+      name: {
         type: Sequelize.STRING,
       },
-      segmentoValor: {
+      address: {
         type: Sequelize.STRING,
-        defaultValue: 0,
+      },
+      phoneNumber: {
+        type: Sequelize.STRING(11),
+      },
+      observation: {
+        type: Sequelize.TEXT,
+      },
+      status: {
+        type: Sequelize.ENUM,
+        values: ['pending', 'done', 'ongoing'],
+        defaultValue: 'pending',
       },
       createdAt: {
         allowNull: false,
@@ -31,6 +41,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Segmento');
+    await queryInterface.dropTable('Factories');
   },
 };

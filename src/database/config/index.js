@@ -14,5 +14,5 @@ module.exports = {
       idle: 10000,
     },
   },
-  production:{}
+  production: {},
 };

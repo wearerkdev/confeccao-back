@@ -1,5 +1,5 @@
 {
-  "name": "confeccao-back",
+  "name": "factory-back",
   "version": "1.0.0",
   "main": "index.js",
   "repository": "https://github.com/wearerkdev/confeccao-back.git",
@@ -14,8 +14,8 @@
     "migrate:up": "npx sequelize-cli db:migrate",
     "migrate:undo": "npx sequelize-cli db:migrate:undo",
     "model:create": "npx sequelize-cli model:generate --name ${name} --attributes user:string",
-    "docker:run": "docker compose -p confeccao-back -f docker-compose.yml up",
-    "docker:build": "docker compose -p confeccao-back -f docker-compose.yml up --build",
+    "docker:run": "docker compose -p factory-back -f docker-compose.yml up",
+    "docker:build": "docker compose -p factory-back -f docker-compose.yml up --build",
     "docker:down": "docker compose down",
     "docker:stop": "docker compose stop",
     "docker:start": "docker compose start",

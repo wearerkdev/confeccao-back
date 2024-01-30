@@ -1,5 +1,9 @@
 # confeccao-back
 
+## Pequeno dicionario
+
+- factory é confecção, apenas mudado para não ter problemas de acentuação
+
 # Como criar migrations?
 
 Veja que no arquivo `package.json` tem um script chamado `model:create`. Veja que ele tem uma variável (`nome`), que para o nome da model . Tendo a model criada, será criado também a migration ao mesmo tempo. E, para usar este script é bem simples. Basta adicionar esta variável antes do comando. Logo ficará algo como

@@ -1,7 +1,7 @@
 'use strict';
 const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Confeccao extends Model {
+  class Factory extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,38 +11,40 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  Confeccao.init(
+  Factory.init(
     {
-      confeccaoID: {
+      factoryID: {
         type: DataTypes.UUID,
         allowNull: false,
         defaultValue: DataTypes.UUIDV4,
       },
-      confeccaoNome: {
+      name: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      confeccaoEndereco: {
+      address: {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      confeccaoTelefone: {
-        type: DataTypes.STRING,
+      phoneNumber: {
+        type: DataTypes.STRING(11),
         allowNull: true,
       },
-      confeccaoObservacao: {
-        type: DataTypes.STRING,
+      observation: {
+        type: DataTypes.TEXT,
         allowNull: true,
       },
-      confeccaoStatus: {
+      status: {
         type: DataTypes.ENUM,
         values: ['pending', 'done', 'ongoing'],
+        defaultValue: 'pending',
       },
     },
     {
       sequelize,
-      modelName: 'Confeccao',
+      modelName: 'Factories',
+      tableName: 'Factories',
     },
   );
-  return Confeccao;
+  return Factory;
 };

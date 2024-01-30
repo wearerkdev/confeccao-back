@@ -2,28 +2,23 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Confeccao', {
+    await queryInterface.createTable('Segments', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      confeccaoID: {
+      segmentID: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
       },
-      confeccaoNome: {
+      name: {
         type: Sequelize.STRING,
       },
-      confeccaoEndereco: {
+      price: {
         type: Sequelize.STRING,
-      },
-      confeccaoTelefone: {
-        type: Sequelize.STRING,
-      },
-      confeccaoObservacao: {
-        type: Sequelize.STRING,
+        defaultValue: 0,
       },
       createdAt: {
         allowNull: false,
@@ -36,6 +31,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Confeccao');
+    await queryInterface.dropTable('Segments');
   },
 };
