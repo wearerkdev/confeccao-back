@@ -6,6 +6,13 @@ meta {
 
 put {
   url: {{baseURL}}/segmento/atualizar/2
-  body: none
+  body: json
   auth: none
+}
+
+body:json {
+  {
+    "name":"monitor",
+    "price": 12.55
+  }
 }
