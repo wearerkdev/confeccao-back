@@ -1,0 +1,21 @@
+meta {
+  name: Adicionar nova confeccao
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseURL}}/factory/nova
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "garrafa 1",
+    "address": "endereco",
+    "phoneNumber": "1234567890",
+    "isNumberWhatsapp": true,
+    "observation": "observation"
+  }
+}
