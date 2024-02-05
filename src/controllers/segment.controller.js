@@ -69,8 +69,41 @@ const findAllSegments = async (request, response, next) => {
   }
 };
 
+const updateSegment = async (request, response, next) => {
+  try {
+    const { id } = request.params;
+    const segment = await models.Segments.findByPk(id);
+
+    if (!segment) {
+      return response.json({
+        message: `Segmento com id ${id} não foi encontrado.`,
+      });
+    }
+
+    const updateData = await models.Segments.update(
+      { ...request.body },
+      {
+        where: {
+          id,
+        },
+      },
+    );
+
+    return response.status(200).json({
+      message: 'Dados do segmento foram atualizados',
+    });
+  } catch (error) {
+    next(error);
+    return response.status(500).json({
+      message: 'Alguma coisa deu erro',
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   addNewSegment,
   findSegmentByID,
   findAllSegments,
+  updateSegment,
 };
