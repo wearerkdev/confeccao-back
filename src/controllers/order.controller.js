@@ -139,6 +139,6 @@ const findAllOrders = async (request, response, next) => {
 
 module.exports = {
   addNewOrder,
-  findPerStatus,
+  // findPerStatus,
   findAllOrders,
 };
