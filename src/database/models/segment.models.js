@@ -1,5 +1,6 @@
 'use strict';
 const { Model } = require('sequelize');
+const Factories = require('./factory.models');
 module.exports = (sequelize, DataTypes) => {
   class Segment extends Model {
     /**
@@ -21,6 +22,13 @@ module.exports = (sequelize, DataTypes) => {
       name: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      segmentName: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          const getName = this.getDataValue('segmentName');
+          return getName;
+        },
       },
       price: {
         type: DataTypes.INTEGER,

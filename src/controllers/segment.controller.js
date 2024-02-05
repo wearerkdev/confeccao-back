@@ -1,4 +1,5 @@
 const models = require('../database/models/index');
+const { Op, Sequelize } = require('sequelize');
 
 const addNewSegment = async (request, response, next) => {
   try {
@@ -19,7 +20,7 @@ const addNewSegment = async (request, response, next) => {
     const createNewSegment = await models.Segments.create(request.body);
 
     return response.status(201).json({
-      message: 'Confecção criada',
+      message: 'Segmento criado',
       createNewSegment,
     });
   } catch (error) {

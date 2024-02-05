@@ -1,5 +1,6 @@
 'use strict';
 const { Model } = require('sequelize');
+const Segments = require('./segment.models');
 module.exports = (sequelize, DataTypes) => {
   class Factory extends Model {
     /**
@@ -36,28 +37,6 @@ module.exports = (sequelize, DataTypes) => {
       },
       observation: {
         type: DataTypes.TEXT,
-        allowNull: true,
-      },
-      status: {
-        type: DataTypes.ENUM,
-        values: ['costurando', 'costurado', 'todos'],
-        defaultValue: 'costurando',
-        allowNull: true,
-      },
-      saidaParaCostura: {
-        type: DataTypes.DATE,
-        allowNull: true,
-      },
-      quantidadeSaida: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-      },
-      retiradaDaCostura: {
-        type: DataTypes.DATE,
-        allowNull: true,
-      },
-      quantidadeRetorno: {
-        type: DataTypes.INTEGER,
         allowNull: true,
       },
     },

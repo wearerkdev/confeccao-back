@@ -2,22 +2,11 @@ const models = require('../database/models/index');
 
 const addNewFactory = async (request, response, next) => {
   try {
-    const { name, address, phoneNumber, status } = request.body;
+    const { name, address, phoneNumber } = request.body;
 
     if (!name || !address || !phoneNumber) {
       return response.status(400).json({
         message: 'Todos os campos devem ser preenchidos',
-      });
-    }
-
-    const progress = Object.freeze({
-      DONE: 'costurado',
-      PENDING: 'costurando',
-    });
-
-    if (!Object.values(progress).includes(status)) {
-      return response.status(400).json({
-        message: 'Status inválido',
       });
     }
 
@@ -66,44 +55,12 @@ const findFactoryByID = async (request, response, next) => {
 const findAllFactories = async (request, response, next) => {
   try {
     const listAllFactories = await models.Factories.findAndCountAll({
-      attributes: [
-        'id',
-        'factoryID',
-        'name',
-        'phoneNumber',
-        'observation',
-        'status',
-      ],
+      attributes: ['id', 'factoryID', 'name', 'phoneNumber', 'observation'],
     });
 
     return response.json({
       message: 'List da todas as confecções',
       listAllFactories,
-    });
-  } catch (error) {
-    next(error);
-    return response.status(500).json({
-      error: error.message,
-    });
-  }
-};
-
-const findPerStatus = async (request, response, next) => {
-  try {
-    const { status } = request.query;
-
-    if (status === 'todos') {
-      return response.json({
-        status: await models.Factories.findAll(),
-      });
-    }
-
-    const findFactoriesPerStatus = await models.Factories.findAll({
-      where: { status },
-    });
-    return response.json({
-      status,
-      findFactoriesPerStatus,
     });
   } catch (error) {
     next(error);
@@ -181,7 +138,6 @@ module.exports = {
   addNewFactory,
   findFactoryByID,
   findAllFactories,
-  findPerStatus,
   updateFactory,
   deleteOneFactory,
 };
