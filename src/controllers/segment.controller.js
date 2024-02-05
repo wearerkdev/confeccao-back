@@ -101,9 +101,43 @@ const updateSegment = async (request, response, next) => {
   }
 };
 
+const deleteSegment = async (request, response, next) => {
+  try {
+    const { id } = request.params;
+    const findSegment = await models.Segments.findByPk(id);
+
+    if (!id) {
+      return response.status(400).json({
+        message: 'Precisa informar id do segment.',
+      });
+    }
+
+    if (!findSegment) {
+      return response.status(404).json({
+        message: `Segmento com id ${id} não foi encontrado. Tem certeza que é o id correto?`,
+      });
+    }
+
+    const segmentToDelete = await models.Segments.destroy({
+      where: { id },
+    });
+
+    return response.status(200).json({
+      message: 'Segmento excluído com sucesso',
+      segmentToDelete,
+    });
+  } catch (error) {
+    next(error);
+    return response.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   addNewSegment,
   findSegmentByID,
   findAllSegments,
   updateSegment,
+  deleteSegment,
 };
