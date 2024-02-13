@@ -1,5 +1,5 @@
 const models = require('../database/models/index');
-// const { Op, Sequelize, and } = require('sequelize');
+const { Op, Sequelize, and } = require('sequelize');
 const Segments = require('../database/models/segment.models');
 
 const addNewOrder = async (request, response, next) => {
@@ -42,7 +42,6 @@ const addNewOrder = async (request, response, next) => {
       const findName = await models.Segments.findOne({
         where: { segmentName: segmentName },
       });
-
       return findName.id;
     };
 
@@ -110,59 +109,71 @@ const addNewOrder = async (request, response, next) => {
   }
 };
 
-// TODO
-// Fix search thru segment and status altogheter
-// const findPerStatus = async (request, response, next) => {
-//   try {
-//     const { status, segmento } = request.query;
+const findPerStatus = async (request, response, next) => {
+  try {
+    const { status, segmento } = request.query;
 
-//     if (status === 'todos') {
-//       return response.json({
-//         status: await models.Orders.findAndCountAll(),
-//       });
-//     }
+    if (status === 'todos') {
+      return response.json({
+        status: await models.Orders.findAndCountAll(),
+      });
+    }
 
-//     if (!status || !segmento) {
-//       return response.json({
-//         message: 'Todos os campos devem ser preenchidos',
-//       });
-//     }
+    if (!status || !segmento) {
+      return response.status(400).json({
+        message: 'Todos os campos devem ser preenchidos',
+      });
+    }
 
-//     const findSegmentName = await models.Segments.findOne({
-//       include: { model: sequelize.models.Segments, as: 'segmentNameInOrders' },
-//       where: { name: segmento },
-//     });
+    const progress = Object.freeze({
+      DONE: 'costurado',
+      PENDING: 'costurando',
+    });
 
-//     if (!findSegmentName.name) {
-//       return response.json({
-//         message: 'Não existem pedidos com este segmento 2',
-//       });
-//     }
+    if (!Object.values(progress).includes(status)) {
+      return response.status(400).json({
+        message: `Status ${status} é inválido.`,
+      });
+    }
 
-//     const findAllOrdersPerStatusAndSegment = await models.Orders.findAll({
-//       include: { model: Segments.name },
-//       where: Sequelize.and([
-//         { status: status, segmento: Sequelize.col('Segments.name') },
-//       ]),
-//     });
+    const findSegmentName = await models.Segments.findOne({
+      where: { segmentName: segmento },
+    });
 
-//     if (!findAllOrdersPerStatusAndSegment) {
-//       return response.json({
-//         message: `Não existem pedidos com o status ${status} e segmento ${findSegmentName}`,
-//       });
-//     }
+    if (!findSegmentName) {
+      return response.status(400).json({
+        message: `O segmento ${segmento} não foi encontrado.`,
+      });
+    }
 
-//     return response.json({
-//       status,
-//       findAllOrdersPerStatusAndSegment,
-//     });
-//   } catch (error) {
-//     next(error);
-//     return response.status(500).json({
-//       error: error.message,
-//     });
-//   }
-// };
+    if (!findSegmentName) {
+      return response.status(400).json({
+        message: `O segmento ${segmento} não foi encontrado.`,
+      });
+    }
+
+    const findAllOrdersPerStatusAndSegment =
+      await models.Orders.findAndCountAll({
+        where: Sequelize.and([{ status: status, segmentName: segmento }]),
+      });
+
+    if (!findAllOrdersPerStatusAndSegment) {
+      return response.json({
+        message: `Não existem pedidos com o status ${status} e segmento ${findSegmentName}`,
+      });
+    }
+
+    return response.json({
+      status,
+      findAllOrdersPerStatusAndSegment,
+    });
+  } catch (error) {
+    next(error);
+    return response.status(500).json({
+      error: error.message,
+    });
+  }
+};
 
 const findAllOrders = async (request, response, next) => {
   try {
@@ -182,8 +193,28 @@ const findAllOrders = async (request, response, next) => {
   }
 };
 
+const findAllPendingOrders = async (request, response, next) => {
+  try {
+    const findAll = await models.Orders.findAndCountAll({
+      order: [['id', 'DESC']],
+      where: { status: 'costurando' },
+    });
+
+    return response.json({
+      message: 'Listagem de todos os pedidos',
+      findAll,
+    });
+  } catch (error) {
+    next(error);
+    return response.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   addNewOrder,
-  // findPerStatus,
+  findPerStatus,
   findAllOrders,
+  findAllPendingOrders,
 };

@@ -6,8 +6,9 @@ const orderRouter = Router();
 orderRouter.post('/novo', orderController.addNewOrder);
 // orderRouter.get('/encontrarpor/:id', orderController.findorderByID);
 // orderRouter.get('/encontrartodos/', orderController.findPerStatus);
-// orderRouter.get('/encontrar/', orderController.findPerStatus);
+orderRouter.get('/encontrarpor/', orderController.findPerStatus);
 // orderRouter.get('/status/', orderRouter.findPerStatus);
-orderRouter.get('/encontrartodos', orderController.findAllOrders);
+orderRouter.get('/encontrarpor/todos', orderController.findAllOrders);
+orderRouter.get('/encontrarpor/pendente', orderController.findAllPendingOrders);
 
 module.exports = orderRouter;

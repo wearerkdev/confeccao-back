@@ -4,6 +4,7 @@
 
 - factory é confecção, apenas mudado para não ter problemas de acentuação
 - segment é segmento, apenas para manter consistência em inglês
+- order é pedido, quando uma confecção faz um pedido, vai o segmento e a confecção na ordem do pedido.
 
 # Como criar migrations?
 
