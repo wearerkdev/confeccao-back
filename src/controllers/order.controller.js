@@ -1,12 +1,12 @@
 const models = require('../database/models/index');
-const { Op, Sequelize, and } = require('sequelize');
+// const { Op, Sequelize, and } = require('sequelize');
 const Segments = require('../database/models/segment.models');
 
 const addNewOrder = async (request, response, next) => {
   try {
     const {
-      segmentID,
-      factoryID,
+      segmentName,
+      factoryName,
       status,
       saidaParaCostura,
       quantidadeDeSaida,
@@ -15,8 +15,8 @@ const addNewOrder = async (request, response, next) => {
     } = request.body;
 
     if (
-      !segmentID ||
-      !factoryID ||
+      !segmentName ||
+      !factoryName ||
       !status ||
       !saidaParaCostura ||
       !quantidadeDeSaida ||
@@ -28,19 +28,50 @@ const addNewOrder = async (request, response, next) => {
       });
     }
 
-    const findSegmentID = await models.Segments.findByPk(segmentID);
+    const findSegmentName = await models.Segments.findOne({
+      where: { segmentName: segmentName },
+    });
 
-    if (!findSegmentID) {
+    if (!findSegmentName) {
       return response.status(400).json({
-        message: `O segmento ${segmentID} não foi encontrado.`,
+        message: `O segmento ${segmentName} não foi encontrado.`,
       });
     }
-    const findFactoryID = await models.Segments.findByPk(factoryID);
-    if (!findFactoryID) {
+
+    const findSegmentIDbyName = async function (segmentName) {
+      const findName = await models.Segments.findOne({
+        where: { segmentName: segmentName },
+      });
+
+      return findName.id;
+    };
+
+    if (!findSegmentName || !findSegmentIDbyName) {
       return response.status(400).json({
-        message: `A confecção ${factoryID} não foi encontrada.`,
+        message: `O segmento ${segmentName} não foi encontrado.`,
       });
     }
+
+    const segmentID = await findSegmentIDbyName(segmentName);
+
+    const findFactoryIDByName = async function (factoryName) {
+      const findName = await models.Factories.findOne({
+        where: { factoryName: factoryName },
+      });
+      return findName.id;
+    };
+
+    const findFactoryName = await models.Factories.findOne({
+      where: { factoryName: factoryName },
+    });
+
+    if (!findFactoryName || !findFactoryIDByName) {
+      return response.status(400).json({
+        message: `A confecção ${factoryName} não foi encontrada.`,
+      });
+    }
+
+    const factoryID = await findFactoryIDByName(factoryName);
 
     const progress = Object.freeze({
       DONE: 'costurado',
@@ -53,7 +84,19 @@ const addNewOrder = async (request, response, next) => {
       });
     }
 
-    const createNewOrder = await models.Orders.create(request.body);
+    const data = {
+      segmentName: request.body.segmentName,
+      factoryName: request.body.factoryName,
+      status: request.body.status,
+      saidaParaCostura: request.body.saidaParaCostura,
+      quantidadeDeSaida: request.body.quantidadeDeSaida,
+      retiradaDaCostura: request.body.retiradaDaCostura,
+      quantidadeDeRetorno: request.body.quantidadeDeRetorno,
+      segmentID: segmentID,
+      factoryID: factoryID,
+    };
+
+    const createNewOrder = await models.Orders.create(data);
 
     return response.status(201).json({
       message: 'Pedido criado',
@@ -123,7 +166,9 @@ const addNewOrder = async (request, response, next) => {
 
 const findAllOrders = async (request, response, next) => {
   try {
-    const findAll = await models.Orders.findAll();
+    const findAll = await models.Orders.findAll({
+      order: [['id', 'DESC']],
+    });
 
     return response.json({
       message: 'Listagem de todos os pedidos',

@@ -19,19 +19,12 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: DataTypes.UUIDV4,
       },
-      name: {
+      segmentName: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      segmentName: {
-        type: DataTypes.VIRTUAL,
-        get() {
-          const getName = this.getDataValue('segmentName');
-          return getName;
-        },
-      },
       price: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DECIMAL,
         allowNull: false,
         defaultValue: 0,
       },

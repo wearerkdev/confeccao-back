@@ -132,3 +132,4 @@ dist
 # General
 .DS_Store
 snippets.md
+/.docker

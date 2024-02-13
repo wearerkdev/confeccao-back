@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: DataTypes.UUIDV4,
       },
-      name: {
+      factoryName: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -30,6 +30,10 @@ module.exports = (sequelize, DataTypes) => {
       phoneNumber: {
         type: DataTypes.STRING(11),
         allowNull: true,
+        unique: true,
+        validate: {
+          is: ['[0-9]', 'i'],
+        },
       },
       isNumberWhatsapp: {
         type: DataTypes.BOOLEAN,

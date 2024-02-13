@@ -22,11 +22,6 @@ module.exports = (sequelize, DataTypes) => {
         sourceKey: 'id',
         foreignKey: 'segmentID',
       });
-      Order.hasOne(models.Segments, {
-        targetKey: 'segmentName',
-        as: 'segmentNameInOrders',
-        foreignKey: 'segmentName',
-      });
     }
   }
   Order.init(
@@ -34,6 +29,9 @@ module.exports = (sequelize, DataTypes) => {
       orderID: {
         type: DataTypes.STRING,
         defaultValue: UUIDV4,
+        validate: {
+          isUUID: 4,
+        },
       },
       factoryID: {
         type: DataTypes.INTEGER,
@@ -41,6 +39,10 @@ module.exports = (sequelize, DataTypes) => {
           model: Factories,
           key: 'id',
         },
+      },
+      factoryName: {
+        type: DataTypes.STRING,
+        values: [],
       },
       segmentID: {
         type: DataTypes.INTEGER,
@@ -50,11 +52,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       segmentName: {
-        type: DataTypes.VIRTUAL,
-        references: {
-          model: 'Segments',
-          key: 'segmentName',
-        },
+        type: DataTypes.STRING,
       },
       status: {
         type: DataTypes.ENUM,

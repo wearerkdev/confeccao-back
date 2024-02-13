@@ -3,9 +3,9 @@ const { Op, Sequelize } = require('sequelize');
 
 const addNewSegment = async (request, response, next) => {
   try {
-    const { name, price } = request.body;
+    const { segmentName, price } = request.body;
 
-    if (!name || !price) {
+    if (!segmentName || !price) {
       return response.status(400).json({
         message: 'Todos os campos devem ser preenchidos',
       });

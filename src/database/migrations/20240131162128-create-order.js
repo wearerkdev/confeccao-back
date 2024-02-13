@@ -23,12 +23,18 @@ module.exports = {
           key: 'id',
         },
       },
+      factoryName: {
+        type: Sequelize.STRING,
+      },
       segmentID: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Segments',
           key: 'id',
         },
+      },
+      segmentName: {
+        type: Sequelize.STRING,
       },
       status: {
         type: Sequelize.ENUM,

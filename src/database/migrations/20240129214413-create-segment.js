@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
       },
-      name: {
+      segmentName: {
         type: Sequelize.STRING,
       },
       price: {

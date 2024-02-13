@@ -2,9 +2,9 @@ const models = require('../database/models/index');
 
 const addNewFactory = async (request, response, next) => {
   try {
-    const { name, address, phoneNumber } = request.body;
+    const { factoryName, address, phoneNumber } = request.body;
 
-    if (!name || !address || !phoneNumber) {
+    if (!factoryName || !address || !phoneNumber) {
       return response.status(400).json({
         message: 'Todos os campos devem ser preenchidos',
       });
@@ -13,6 +13,16 @@ const addNewFactory = async (request, response, next) => {
     if (phoneNumber.length > 11) {
       return response.status(400).json({
         message: 'Número de telefone não pode possuir mais que 11 dígitos',
+      });
+    }
+
+    const phoneNumberAlreadyExists = await models.Factories.findOne({
+      where: { phoneNumber },
+    });
+
+    if (phoneNumberAlreadyExists) {
+      return response.status(400).json({
+        message: 'Este número de telefone já está cadastrado.',
       });
     }
 
@@ -55,7 +65,13 @@ const findFactoryByID = async (request, response, next) => {
 const findAllFactories = async (request, response, next) => {
   try {
     const listAllFactories = await models.Factories.findAndCountAll({
-      attributes: ['id', 'factoryID', 'name', 'phoneNumber', 'observation'],
+      attributes: [
+        'id',
+        'factoryID',
+        'factoryName',
+        'phoneNumber',
+        'observation',
+      ],
     });
 
     return response.json({

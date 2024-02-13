@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
       },
-      name: {
+      factoryName: {
         type: Sequelize.STRING,
       },
       address: {
@@ -21,6 +21,10 @@ module.exports = {
       },
       phoneNumber: {
         type: Sequelize.STRING(11),
+        unique: true,
+        validate: {
+          is: ['[0-9]', 'i'],
+        },
       },
       isNumberWhatsapp: {
         type: Sequelize.BOOLEAN,
