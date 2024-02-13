@@ -166,7 +166,7 @@ const addNewOrder = async (request, response, next) => {
 
 const findAllOrders = async (request, response, next) => {
   try {
-    const findAll = await models.Orders.findAll({
+    const findAll = await models.Orders.findAndCountAll({
       order: [['id', 'DESC']],
     });
 
