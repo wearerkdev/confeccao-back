@@ -10,5 +10,6 @@ orderRouter.get('/encontrarpor/', orderController.findPerStatus);
 // orderRouter.get('/status/', orderRouter.findPerStatus);
 orderRouter.get('/encontrarpor/todos', orderController.findAllOrders);
 orderRouter.get('/encontrarpor/pendente', orderController.findAllPendingOrders);
+orderRouter.put('/atualizar/:id', orderController.updateOrder);
 
 module.exports = orderRouter;

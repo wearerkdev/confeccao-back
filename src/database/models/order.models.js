@@ -59,18 +59,34 @@ module.exports = (sequelize, DataTypes) => {
         values: ['costurando', 'costurado'],
         defaultValue: 'costurando',
         allowNull: false,
+        validate: {
+          isIn: ['costurando', 'costurado'],
+        },
       },
       saidaParaCostura: {
         type: DataTypes.DATE,
         allowNull: false,
+        validate: {
+          isDate: true,
+        },
       },
       quantidadeDeSaida: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        validate: {
+          min: 0,
+          isNumeric: true,
+          isInt: true,
+          notNull: true,
+          notEmpty: true,
+        },
       },
       retiradaDaCostura: {
         type: DataTypes.DATE,
         allowNull: false,
+        validate: {
+          isDate: true,
+        },
       },
       quantidadeDeRetorno: {
         type: DataTypes.INTEGER,
