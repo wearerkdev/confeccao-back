@@ -352,6 +352,39 @@ const findOrderByID = async (request, response, next) => {
   } catch (error) {}
 };
 
+const deleteOrderByID = async (request, response, next) => {
+  try {
+    const { id } = request.params;
+    const order = await models.Orders.findByPk(id);
+
+    if (!id) {
+      return response.status(400).json({
+        message: 'Precisa informar id do pedido.',
+      });
+    }
+
+    if (!order) {
+      return response.status(400).json({
+        message: `Não foi possível encontrar o pedido com id '${id}' informado. Confira o ID e tente novamente.`,
+      });
+    }
+
+    const deleteOrder = await models.Orders.destroy({
+      where: { id },
+    });
+
+    return response.status(200).json({
+      message: `Pedido de id '${id}'  excluído com sucesso`,
+      deleteOrder,
+    });
+  } catch (error) {
+    next(error);
+    return response.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   addNewOrder,
   findPerStatus,
@@ -359,4 +392,5 @@ module.exports = {
   findAllPendingOrders,
   updateOrder,
   findOrderByID,
+  deleteOrderByID,
 };

@@ -114,7 +114,7 @@ const deleteSegment = async (request, response, next) => {
 
     if (!findSegment) {
       return response.status(404).json({
-        message: `Segmento com id ${id} não foi encontrado. Tem certeza que é o id correto?`,
+        message: `Segmento com id '${id}' não foi encontrado. Tem certeza que é o id correto?`,
       });
     }
 
