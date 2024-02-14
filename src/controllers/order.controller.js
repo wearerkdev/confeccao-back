@@ -340,10 +340,23 @@ const updateOrder = async (request, response, next) => {
   }
 };
 
+const findOrderByID = async (request, response, next) => {
+  try {
+    const { id } = request.params;
+    const order = await models.Orders.findByPk(id);
+
+    return response.json({
+      message: 'Listagem de ordem por ID informado',
+      order,
+    });
+  } catch (error) {}
+};
+
 module.exports = {
   addNewOrder,
   findPerStatus,
   findAllOrders,
   findAllPendingOrders,
   updateOrder,
+  findOrderByID,
 };
