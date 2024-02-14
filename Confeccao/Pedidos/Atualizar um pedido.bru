@@ -6,6 +6,19 @@ meta {
 
 put {
   url: {{baseURL}}/order/atualizar/58
-  body: none
+  body: json
   auth: none
+}
+
+body:json {
+  {
+    "factoryID": 1,
+    "factoryName": "garrafa 1",
+    "segmentID": 2,
+    "segmentName": "copo3",
+    "status": "costurando",
+    "saidaParaCostura": "2024-03-01T20:29:25.000Z",
+    "quantidadeDeSaida": 10,
+    "retiradaDaCostura": "2024-03-01T20:29:25.000Z"
+  }
 }
