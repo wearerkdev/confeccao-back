@@ -1,3 +1,4 @@
+const { Sequelize } = require('sequelize');
 const models = require('../database/models/index');
 
 const addNewFactory = async (request, response, next) => {
@@ -131,6 +132,22 @@ const deleteOneFactory = async (request, response, next) => {
     if (!findFactory) {
       return response.status(404).json({
         message: `Confecção com id ${id} não foi encontrada. Tem certeza que é o id correto?`,
+      });
+    }
+
+    const existOrders = await models.Orders.findAndCountAll({
+      where: Sequelize.and([{ factoryID: id, status: 'costurando' }]),
+    });
+
+    const findOrdersID = await models.Orders.findAll({
+      where: Sequelize.and([{ factoryID: id, status: 'costurando' }]),
+    });
+
+    const listOrdersID = findOrdersID.map(item => item.id).join(', ');
+
+    if (existOrders) {
+      return response.status(400).json({
+        message: `Existe(m) ${existOrders.count} pedido(s) abertos com esta confecção. Finalize estes pedidos antes de deletar esta confecção. Os IDs do(s) pedido(s) são ${listOrdersID}`,
       });
     }
 
