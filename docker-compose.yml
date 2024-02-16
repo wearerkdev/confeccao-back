@@ -14,6 +14,7 @@ services:
       MYSQL_AUTHENTICATION_PLUGIN: caching_sha2_password
     volumes:
       - .docker/db:/var/lib/mysql
+      - ./mysql.cnf:/etc/mysql/mysql.cnf
     healthcheck:
       test:
         ['CMD', 'mysqladmin', '-usequelize_test', '-psequelize_test', 'status']
@@ -23,7 +24,7 @@ services:
     restart: always
     networks:
       - factory
-    # command: ['mysqld', '--authentication-policy=caching_sha2_password']
+    command: --log_error_verbosity=2
 
   adminer:
     image: adminer

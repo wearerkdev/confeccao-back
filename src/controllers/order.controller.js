@@ -1,7 +1,9 @@
 const models = require('../database/models/index');
-const { Op, Sequelize, and } = require('sequelize');
-const Segments = require('../database/models/segment.models');
+const { Sequelize } = require('sequelize');
 const { isValidDate } = require('../utils/isValidDate');
+// const segment = models.Segments;
+// const factory = models.Factories;
+// const order = models.Orders;
 
 const addNewOrder = async (request, response, next) => {
   try {
@@ -21,8 +23,7 @@ const addNewOrder = async (request, response, next) => {
       !status ||
       !saidaParaCostura ||
       !quantidadeDeSaida ||
-      !retiradaDaCostura ||
-      !quantidadeDeRetorno
+      !retiradaDaCostura
     ) {
       return response.status(400).json({
         message: 'Todos os campos devem ser preenchidos',
@@ -73,6 +74,21 @@ const addNewOrder = async (request, response, next) => {
 
     const factoryID = await findFactoryIDByName(factoryName);
 
+    const findSegmentPrice = async function (segmentName) {
+      const findPrice = await models.Segments.findOne({
+        where: { segmentName: segmentName },
+      });
+      return findPrice.price;
+    };
+
+    const calculateOrderPrice = async function (segmentName) {
+      const calculateOrderPrice =
+        (await findSegmentPrice(segmentName)) *
+        (quantidadeDeSaida - quantidadeDeRetorno);
+
+      return Number(calculateOrderPrice.toFixed(2));
+    };
+
     const progress = Object.freeze({
       DONE: 'costurado',
       PENDING: 'costurando',
@@ -85,15 +101,16 @@ const addNewOrder = async (request, response, next) => {
     }
 
     const data = {
+      segmentID: segmentID,
       segmentName: request.body.segmentName,
+      factoryID: factoryID,
       factoryName: request.body.factoryName,
+      totalPrice: await calculateOrderPrice(segmentName),
       status: request.body.status,
       saidaParaCostura: request.body.saidaParaCostura,
       quantidadeDeSaida: request.body.quantidadeDeSaida,
       retiradaDaCostura: request.body.retiradaDaCostura,
       quantidadeDeRetorno: request.body.quantidadeDeRetorno,
-      segmentID: segmentID,
-      factoryID: factoryID,
     };
 
     const createNewOrder = await models.Orders.create(data);
@@ -147,11 +164,22 @@ const findPerStatus = async (request, response, next) => {
       });
     }
 
-    if (!findSegmentName) {
+    const getOrderID = async () => {
+      const order = await models.Orders.findOne();
+      return order.id;
+    };
+
+    if (!getOrderID) {
       return response.status(400).json({
-        message: `O segmento ${segmento} não foi encontrado.`,
+        message: 'Não foi possível encontrar o ID do pedido',
       });
     }
+
+    // const fprice = await models.Orders.findOne({
+    //   where: { id: await getOrderID() },
+    // });
+
+    // const totalPrice = await calculateOrderPrice().totalPrice;
 
     const findAllOrdersPerStatusAndSegment =
       await models.Orders.findAndCountAll({
@@ -164,9 +192,17 @@ const findPerStatus = async (request, response, next) => {
       });
     }
 
+    const data = {
+      ...findAllOrdersPerStatusAndSegment,
+      // orderPrice: totalPrice,
+    };
+
+    console.log('data', JSON.stringify(data, null, 2));
+
     return response.json({
       status,
       findAllOrdersPerStatusAndSegment,
+      // calculateOrderPrice,
     });
   } catch (error) {
     next(error);
@@ -216,14 +252,13 @@ const findAllPendingOrders = async (request, response, next) => {
 const updateOrder = async (request, response, next) => {
   try {
     const {
-      factoryID,
       factoryName,
-      segmentID,
       segmentName,
       status,
       saidaParaCostura,
       quantidadeDeSaida,
       retiradaDaCostura,
+      quantidadeDeRetorno,
     } = request.body;
 
     const { id } = request.params;
@@ -254,13 +289,7 @@ const updateOrder = async (request, response, next) => {
 
     const segmentIDFound = await findSegmentIDbyName(segmentName);
 
-    if (segmentIDFound !== segmentID) {
-      return response.status(400).json({
-        message: `O id '${segmentID}' informado é diferente do ID do segmento informado. Favor conferir o ID correto.`,
-      });
-    }
-
-    if (!findSegmentName || !findSegmentIDbyName) {
+    if (!segmentIDFound || !findSegmentName) {
       return response.status(400).json({
         message: `O segmento '${segmentName}' não foi encontrado.`,
       });
@@ -270,6 +299,13 @@ const updateOrder = async (request, response, next) => {
       const findName = await models.Factories.findOne({
         where: { factoryName: factoryName },
       });
+
+      if (!findName) {
+        return response.status(400).json({
+          message: `A confecção '${factoryName}' não foi encontrada.`,
+        });
+      }
+
       return findName.id;
     };
 
@@ -279,17 +315,26 @@ const updateOrder = async (request, response, next) => {
 
     const factoryIDFound = await findFactoryIDByName(factoryName);
 
-    if (factoryIDFound !== findFactoryName.id) {
-      return response.status(400).json({
-        message: `O id '${factoryID}' informado é diferente da confecção informada. Favor conferir o ID correto.`,
-      });
-    }
-
     if (!findFactoryName || !factoryIDFound) {
       return response.status(400).json({
         message: `A confecção '${factoryName}' não foi encontrada.`,
       });
     }
+
+    const findSegmentPrice = async function (segmentName) {
+      const findPrice = await models.Segments.findOne({
+        where: { segmentName: segmentName },
+      });
+      return findPrice.price;
+    };
+
+    const calculateOrderPrice = async function (segmentName) {
+      const calculateOrderPrice =
+        (await findSegmentPrice(segmentName)) *
+        (quantidadeDeSaida - quantidadeDeRetorno);
+
+      return Number(calculateOrderPrice.toFixed(2));
+    };
 
     const progress = Object.freeze({
       DONE: 'costurado',
@@ -320,16 +365,31 @@ const updateOrder = async (request, response, next) => {
       });
     }
 
-    const updateData = await models.Orders.update(
-      { ...request.body },
+    const data = {
+      segmentID: factoryIDFound,
+      segmentName: request.body.segmentName,
+      factoryID: factoryIDFound,
+      factoryName: request.body.factoryName,
+      totalPrice: await calculateOrderPrice(segmentName),
+      status: request.body.status,
+      saidaParaCostura: request.body.saidaParaCostura,
+      quantidadeDeSaida: request.body.quantidadeDeSaida,
+      retiradaDaCostura: request.body.retiradaDaCostura,
+      quantidadeDeRetorno: request.body.quantidadeDeRetorno,
+    };
+
+    const updateOrder = await models.Orders.update(
+      { ...data },
       {
         where: {
           id,
         },
       },
     );
+
     return response.status(200).json({
       message: 'Dados do segmento foram atualizados',
+      data,
     });
   } catch (error) {
     next(error);

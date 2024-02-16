@@ -49,6 +49,7 @@ module.exports = {
       quantidadeDeSaida: {
         type: Sequelize.INTEGER,
         allowNull: true,
+        defaultValue: 0,
       },
       retiradaDaCostura: {
         type: Sequelize.DATE,
@@ -57,6 +58,15 @@ module.exports = {
       quantidadeDeRetorno: {
         type: Sequelize.INTEGER,
         allowNull: true,
+        defaultValue: 0,
+      },
+      totalPrice: {
+        type: Sequelize.DECIMAL,
+        allowNull: false,
+        defaultValue: 0,
+        validate: {
+          isDecimal: true,
+        },
       },
       createdAt: {
         allowNull: false,
