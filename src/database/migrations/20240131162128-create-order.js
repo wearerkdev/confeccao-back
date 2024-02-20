@@ -50,6 +50,13 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
         defaultValue: 0,
+        validate: {
+          min: 0,
+          isNumeric: true,
+          isInt: true,
+          notNull: true,
+          notEmpty: true,
+        },
       },
       retiradaDaCostura: {
         type: Sequelize.DATE,
@@ -59,14 +66,22 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
         defaultValue: 0,
+        validate: {
+          min: 0,
+          isNumeric: true,
+          isInt: true,
+          notNull: true,
+          notEmpty: true,
+        },
       },
-      totalPrice: {
-        type: Sequelize.DECIMAL,
+      orderPrice: {
+        type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
         defaultValue: 0,
-        validate: {
-          isDecimal: true,
-        },
+      },
+      isDone: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
       },
       createdAt: {
         allowNull: false,

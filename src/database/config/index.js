@@ -7,6 +7,17 @@ module.exports = {
     database: process.env.MYSQL_DATABASE,
     host: 'localhost',
     dialect: 'mysql',
+    dialectOptions: {
+      useUTC: false,
+      dateStrings: true,
+      typeCast: function (field, next) {
+        if (field.type === 'DATETIME') {
+          return field.string();
+        }
+        return next();
+      },
+      timezone: '+03:00',
+    },
     pool: {
       max: 5,
       min: 0,

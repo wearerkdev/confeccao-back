@@ -94,6 +94,13 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
+        validate: {
+          min: 0,
+          isNumeric: true,
+          isInt: true,
+          notNull: true,
+          notEmpty: true,
+        },
       },
       aFazer: {
         type: DataTypes.VIRTUAL,
@@ -106,13 +113,14 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
 
-      totalPrice: {
-        type: DataTypes.DECIMAL,
+      orderPrice: {
+        type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
         defaultValue: 0,
-        validate: {
-          isDecimal: true,
-        },
+      },
+      isDone: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
       },
     },
     {
@@ -125,18 +133,3 @@ module.exports = (sequelize, DataTypes) => {
 
   return Order;
 };
-
-/*
-sequelize.models.modelName // The model will now be available in models under the class name
-As shown above, column definitions can be either strings, a reference to one of the datatypes that are predefined on the Sequelize constructor, or an object that allows you to specify both the type of the column, and other attributes such as default values, foreign key constraints and custom setters and getters.
-
-For a list of possible data types, see https://sequelize.org/master/en/latest/docs/models-definition/#data-types
-
-For more about getters and setters, see https://sequelize.org/master/en/latest/docs/models-definition/#getters-setters
-
-For more about instance and class methods, see https://sequelize.org/master/en/latest/docs/models-definition/#expansion-of-models
-
-For more about validation, see https://sequelize.org/master/en/latest/docs/models-definition/#validations
-
-@returns — Return the initialized model
-*/
