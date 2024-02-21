@@ -102,8 +102,8 @@ module.exports = (sequelize, DataTypes) => {
           notEmpty: true,
         },
       },
-      aFazer: {
-        type: DataTypes.VIRTUAL,
+      pecasFaltantes: {
+        type: DataTypes.INTEGER,
         get() {
           const total =
             this.getDataValue('quantidadeDeSaida') -
@@ -111,6 +111,7 @@ module.exports = (sequelize, DataTypes) => {
 
           return total;
         },
+        defaultValue: 0,
       },
 
       orderPrice: {

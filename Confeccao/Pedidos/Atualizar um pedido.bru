@@ -5,16 +5,15 @@ meta {
 }
 
 put {
-  url: {{baseURL}}/order/atualizar/8
+  url: {{baseURL}}/order/atualizar/10
   body: json
   auth: none
 }
 
 body:json {
   {
-    "quantidadeDeSaida": 1,
-    "quantidadeDeRetorno": 0
+    "quantidadeDeSaida": 100,
+    "quantidadeDeRetorno": 50,
+    "saidaParaCostura": "2024-02-20T18:36:40.170Z"
   }
-  
-  
 }

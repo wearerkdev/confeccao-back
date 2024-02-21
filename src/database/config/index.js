@@ -8,7 +8,6 @@ module.exports = {
     host: 'localhost',
     dialect: 'mysql',
     dialectOptions: {
-      useUTC: false,
       dateStrings: true,
       typeCast: function (field, next) {
         if (field.type === 'DATETIME') {

@@ -74,6 +74,17 @@ module.exports = {
           notEmpty: true,
         },
       },
+      pecasFaltantes: {
+        type: Sequelize.INTEGER,
+        get() {
+          const total =
+            this.getDataValue('quantidadeDeSaida') -
+            this.getDataValue('quantidadeDeRetorno');
+
+          return total;
+        },
+        defaultValue: 0,
+      },
       orderPrice: {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false,

@@ -9,7 +9,6 @@ const addNewOrder = async (request, response, next) => {
     if (
       !fieldsFromBody.segmentName ||
       !fieldsFromBody.factoryName ||
-      !fieldsFromBody.status ||
       !fieldsFromBody.saidaParaCostura ||
       !fieldsFromBody.quantidadeDeSaida ||
       !fieldsFromBody.retiradaDaCostura
@@ -78,17 +77,6 @@ const addNewOrder = async (request, response, next) => {
       return calculateOrderPrice;
     };
 
-    const progress = Object.freeze({
-      DONE: 'costurado',
-      PENDING: 'costurando',
-    });
-
-    if (!Object.values(progress).includes(fieldsFromBody.status)) {
-      return response.status(400).json({
-        message: 'Status inválido',
-      });
-    }
-
     const orderPrice = await calculateOrderPrice(fieldsFromBody.segmentName);
 
     const data = {
@@ -96,13 +84,14 @@ const addNewOrder = async (request, response, next) => {
       segmentName: fieldsFromBody.segmentName,
       factoryID: factoryID,
       factoryName: fieldsFromBody.factoryName,
-      orderPrice: await calculateOrderPrice(fieldsFromBody.segmentName),
+      orderPrice: orderPrice,
       status: fieldsFromBody.status,
       saidaParaCostura: fieldsFromBody.saidaParaCostura,
       quantidadeDeSaida: fieldsFromBody.quantidadeDeSaida,
       retiradaDaCostura: fieldsFromBody.retiradaDaCostura,
       quantidadeDeRetorno: fieldsFromBody.quantidadeDeRetorno,
-      // orderPrice: orderPrice,
+      pecasFaltantes:
+        fieldsFromBody.quantidadeDeSaida - fieldsFromBody.quantidadeDeRetorno,
     };
 
     const createNewOrder = await models.Orders.create(data);
@@ -239,8 +228,13 @@ const updateOrder = async (request, response, next) => {
     const fieldsFromBody = request.body;
 
     const { id } = request.params;
-    const order = await models.Orders.findByPk(id);
+    if (!id || isNaN(id)) {
+      return response.status(404).json({
+        message: `É necessário informar um id para poder atualizar um pedido.`,
+      });
+    }
 
+    const order = await models.Orders.findByPk(id);
     if (!order) {
       return response.status(404).json({
         message: `Pedido com id '${id}' não foi encontrado.`,
@@ -266,9 +260,20 @@ const updateOrder = async (request, response, next) => {
           fieldsFromBody.quantidadeDeSaida) <= 0,
     );
 
+    const validate_quantidadeDeRetorno = Boolean(
+      fieldsFromBody.quantidadeDeRetorno &&
+        (isNaN(fieldsFromBody.quantidadeDeRetorno) ||
+          fieldsFromBody.quantidadeDeRetorno) <= 0,
+    );
+
     if (validate_quantidadeDeSaida) {
       return response.status(400).json({
         message: `O valor '${fieldsFromBody.quantidadeDeSaida}' informado para quantidade de saída deve ser um número positivo e maior que 0.`,
+      });
+    }
+    if (validate_quantidadeDeRetorno) {
+      return response.status(400).json({
+        message: `O valor '${fieldsFromBody.quantidadeDeRetorno}' informado para quantidade de retorno deve ser um número positivo e maior que 0.`,
       });
     }
 
@@ -327,16 +332,6 @@ const updateOrder = async (request, response, next) => {
       });
     }
 
-    if (
-      fieldsFromBody.quantidadeDeSaida &&
-      (isNaN(Number(fieldsFromBody?.quantidadeDeSaida)) ||
-        isNaN(Number(fieldsFromBody?.quantidadeDeSaida) <= 0))
-    ) {
-      return response.status(400).json({
-        message: `O valor '${fieldsFromBody.quantidadeDeSaida}' informado para quantidade de saída deve ser um número positivo e maior que 0.`,
-      });
-    }
-
     if (fieldsFromBody.isDone && typeof fieldsFromBody.isDone !== 'boolean') {
       return response.status(400).json({
         message: "O valor para 'Está pronto?' deve ser apenas 'sim' ou 'não'.",
@@ -357,9 +352,12 @@ const updateOrder = async (request, response, next) => {
 
     // ### VALIDAÇÕES PARA ATUALIZAÇÃO DE PREÇOS BASEADO NO BODY ###
 
-    const has_quantidadeDeSaida = fieldsFromBody.quantidadeDeSaida;
-    const has_quantidadeDeRetorno = fieldsFromBody.quantidadeDeRetorno;
-    const has_saidaEretorno = has_quantidadeDeSaida && has_quantidadeDeRetorno;
+    const has_quantidadeDeSaida =
+      fieldsFromBody.quantidadeDeSaida && !fieldsFromBody.quantidadeDeRetorno;
+    const has_quantidadeDeRetorno =
+      fieldsFromBody.quantidadeDeRetorno && !fieldsFromBody.quantidadeDeSaida;
+    const has_saidaEretorno =
+      fieldsFromBody.quantidadeDeSaida && fieldsFromBody.quantidadeDeRetorno;
 
     /**
      * @description Se os campos 'quantidadeDeSaida' e 'quantidadeDeRetorno' forem informados,
@@ -397,15 +395,18 @@ const updateOrder = async (request, response, next) => {
 
     if (has_quantidadeDeRetorno) {
       const segmentPrice = await findSegmentPrice(findSegmentNameFromOrderID);
+
       Number(
-        segmentPrice *
+        (fieldsFromBody.orderPrice =
+          segmentPrice *
           (findQuantidadeDeSaidaFromOrderID -
-            fieldsFromBody.quantidadeDeRetorno),
+            fieldsFromBody.quantidadeDeRetorno)),
       ).toFixed(2);
     }
 
     const data = {
-      orderPrice: fieldsFromBody.orderPrice,
+      orderPrice: fieldsFromBody?.orderPrice || order.orderPrice,
+      status: fieldsFromBody?.status || findStatusFromOrderID,
       quantidadeDeSaida:
         fieldsFromBody?.quantidadeDeSaida || findQuantidadeDeSaidaFromOrderID,
       quantidadeDeRetorno:
@@ -416,16 +417,18 @@ const updateOrder = async (request, response, next) => {
       saidaParaCostura:
         fieldsFromBody?.saidaParaCostura || findSaidaParaCosturaFromOrderID,
       isDone: fieldsFromBody?.isDone || findIsDoneFromOrderID,
+      pecasFaltantes:
+        (fieldsFromBody?.quantidadeDeSaida ||
+          findQuantidadeDeSaidaFromOrderID) -
+        (fieldsFromBody?.quantidadeDeRetorno ||
+          findQuantidadeDeRetornoFromOrderID),
     };
 
-    const updateOrder = await models.Orders.update(
-      { ...data },
-      {
-        where: {
-          id,
-        },
+    const updateOrder = await models.Orders.update(data, {
+      where: {
+        id,
       },
-    );
+    });
 
     return response.status(200).json({
       message: 'Dados do segmento foram atualizados',
