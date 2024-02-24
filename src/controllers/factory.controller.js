@@ -30,7 +30,7 @@ const addNewFactory = async (request, response, next) => {
     const createNewFactory = await models.Factories.create(request.body);
 
     return response.status(201).json({
-      message: 'Confecção criada',
+      message: 'Confecção criada com sucesso.',
       createNewFactory,
     });
   } catch (error) {
@@ -46,8 +46,14 @@ const findFactoryByID = async (request, response, next) => {
     const { id } = request.params;
     const factory = await models.Factories.findByPk(id);
 
+    if (!id || isNaN(id)) {
+      return response.status(400).json({
+        message: `É necessário informar um id.`,
+      });
+    }
+
     if (!factory) {
-      return response.json({
+      return response.status(404).json({
         message: `Confecção com id ${id} não foi encontrada.`,
       });
     }
@@ -70,13 +76,21 @@ const findAllFactories = async (request, response, next) => {
         'id',
         'factoryID',
         'factoryName',
+        'address',
         'phoneNumber',
+        'isNumberWhatsapp',
         'observation',
       ],
     });
 
-    return response.json({
-      message: 'List da todas as confecções',
+    if (listAllFactories.count === 0) {
+      return response.status(404).json({
+        message: 'Não tem nenhuma confecção cadastrada.',
+      });
+    }
+
+    return response.status(200).json({
+      message: 'Listagem de todas as confecções',
       listAllFactories,
     });
   } catch (error) {
@@ -87,13 +101,19 @@ const findAllFactories = async (request, response, next) => {
   }
 };
 
-const updateFactory = async (request, response, next) => {
+const updateOneFactory = async (request, response, next) => {
   try {
     const { id } = request.params;
     const factory = await models.Factories.findByPk(id);
 
+    if (!id || isNaN(id)) {
+      return response.status(400).json({
+        message: `É necessário informar um id.`,
+      });
+    }
+
     if (!factory) {
-      return response.json({
+      return response.status(404).json({
         message: `Confecção com id ${id} não foi encontrada.`,
       });
     }
@@ -109,6 +129,7 @@ const updateFactory = async (request, response, next) => {
 
     return response.status(200).json({
       message: 'Dados da confecção foram atualizados',
+      updateData,
     });
   } catch (error) {
     next(error);
@@ -123,9 +144,9 @@ const deleteOneFactory = async (request, response, next) => {
     const { id } = request.params;
     const findFactory = await models.Factories.findByPk(id);
 
-    if (!id) {
+    if (!id || isNaN(id)) {
       return response.status(400).json({
-        message: 'Precisa informar id da confecção.',
+        message: `É necessário informar um id.`,
       });
     }
 
@@ -171,6 +192,6 @@ module.exports = {
   addNewFactory,
   findFactoryByID,
   findAllFactories,
-  updateFactory,
+  updateOneFactory,
   deleteOneFactory,
 };

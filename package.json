@@ -9,6 +9,7 @@
     "name": "We are RK Dev"
   },
   "scripts": {
+    "start": "node src/index.js",
     "start:dev": "nodemon -r dotenv/config src/index.js",
     "migration:create": "npx sequelize-cli migration:create --name ${name}",
     "migrate:up": "npx sequelize-cli db:migrate",
@@ -20,7 +21,8 @@
     "docker:down": "docker compose down",
     "docker:stop": "docker compose stop",
     "docker:start": "docker compose start",
-    "docker:del": "docker system prune --all --volumes --force"
+    "docker:del": "docker system prune --all --volumes --force",
+    "docs": "swagger-cli bundle src/swagger/index.yaml --outfile src/swagger/index.json"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -30,13 +32,15 @@
     "hpp": "^0.2.3",
     "mysql2": "^3.9.1",
     "sequelize": "^6.37.1",
+    "swagger-ui-express": "^5.0.0",
     "xss": "^1.0.14"
   },
   "devDependencies": {
     "colors": "^1.4.0",
     "morgan": "^1.10.0",
     "nodemon": "^3.0.3",
-    "sequelize-cli": "^6.6.2"
+    "sequelize-cli": "^6.6.2",
+    "swagger-cli": "^4.0.4"
   },
   "engines": {
     "node": ">=20.10.0",

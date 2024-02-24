@@ -36,9 +36,15 @@ const findSegmentByID = async (request, response, next) => {
     const { id } = request.params;
     const segment = await models.Segments.findByPk(id);
 
+    if (!id || isNaN(id)) {
+      return response.status(400).json({
+        message: `É necessário informar um id.`,
+      });
+    }
+
     if (!segment) {
-      return response.json({
-        message: `Segmento com id ${id} não foi encontrada.`,
+      return response.status(404).json({
+        message: `Segmento com id ${id} não foi encontrado.`,
       });
     }
 
@@ -57,7 +63,13 @@ const findAllSegments = async (request, response, next) => {
   try {
     const listAllSegments = await models.Segments.findAndCountAll();
 
-    return response.json({
+    if (listAllSegments.count === 0) {
+      return response.status(400).json({
+        message: 'Nenhum segmento foi cadastrado ainda.',
+      });
+    }
+
+    return response.status(200).json({
       message: 'Listagem de todos os segmentos',
       listAllSegments,
     });
@@ -74,8 +86,14 @@ const updateSegment = async (request, response, next) => {
     const { id } = request.params;
     const segment = await models.Segments.findByPk(id);
 
+    if (!id || isNaN(id)) {
+      return response.status(400).json({
+        message: `É necessário informar um id.`,
+      });
+    }
+
     if (!segment) {
-      return response.json({
+      return response.status(404).json({
         message: `Segmento com id ${id} não foi encontrado.`,
       });
     }
@@ -106,9 +124,9 @@ const deleteSegment = async (request, response, next) => {
     const { id } = request.params;
     const findSegment = await models.Segments.findByPk(id);
 
-    if (!id) {
+    if (!id || isNaN(id)) {
       return response.status(400).json({
-        message: 'Precisa informar id do segment.',
+        message: `É necessário informar um id.`,
       });
     }
 

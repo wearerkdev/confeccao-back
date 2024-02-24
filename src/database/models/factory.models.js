@@ -42,6 +42,7 @@ module.exports = (sequelize, DataTypes) => {
       observation: {
         type: DataTypes.TEXT,
         allowNull: true,
+        defaultValue: '',
       },
     },
     {

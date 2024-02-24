@@ -23,7 +23,7 @@ const addNewOrder = async (request, response, next) => {
     });
 
     if (!findSegmentName) {
-      return response.status(400).json({
+      return response.status(404).json({
         message: `O segmento ${fieldsFromBody.segmentName} não foi encontrado.`,
       });
     }
@@ -36,7 +36,7 @@ const addNewOrder = async (request, response, next) => {
     };
 
     if (!findSegmentName || !findSegmentIDbyName) {
-      return response.status(400).json({
+      return response.status(404).json({
         message: `O segmento ${fieldsFromBody.segmentName} não foi encontrado.`,
       });
     }
@@ -55,7 +55,7 @@ const addNewOrder = async (request, response, next) => {
     });
 
     if (!findFactoryName || !findFactoryIDByName) {
-      return response.status(400).json({
+      return response.status(404).json({
         message: `A confecção ${fieldsFromBody.factoryName} não foi encontrada.`,
       });
     }
@@ -112,12 +112,6 @@ const findPerStatus = async (request, response, next) => {
   try {
     const { status, segmento } = request.query;
 
-    if (status === 'todos') {
-      return response.json({
-        status: await models.Orders.findAndCountAll(),
-      });
-    }
-
     if (!status || !segmento) {
       return response.status(400).json({
         message: 'Todos os campos devem ser preenchidos',
@@ -140,7 +134,7 @@ const findPerStatus = async (request, response, next) => {
     });
 
     if (!findSegmentName) {
-      return response.status(400).json({
+      return response.status(404).json({
         message: `O segmento ${segmento} não foi encontrado.`,
       });
     }
@@ -151,8 +145,8 @@ const findPerStatus = async (request, response, next) => {
     };
 
     if (!getOrderID) {
-      return response.status(400).json({
-        message: 'Não foi possível encontrar o ID do pedido',
+      return response.status(404).json({
+        message: 'Não foi possível encontrar o ID do pedido informado.',
       });
     }
 
@@ -163,7 +157,7 @@ const findPerStatus = async (request, response, next) => {
 
     if (!findAllOrdersPerStatusAndSegment) {
       return response.json({
-        message: `Não existem pedidos com o status ${status} e segmento ${findSegmentName}`,
+        message: `Não existem pedidos com o status ${status} e segmento ${findSegmentName} cadastrado.`,
       });
     }
 
@@ -171,12 +165,10 @@ const findPerStatus = async (request, response, next) => {
       ...findAllOrdersPerStatusAndSegment,
     };
 
-    console.log('data', JSON.stringify(data, null, 2));
-
     return response.json({
       status,
-      findAllOrdersPerStatusAndSegment,
-      // calculateOrderPrice,
+      segmento,
+      data,
     });
   } catch (error) {
     next(error);
@@ -192,7 +184,13 @@ const findAllOrders = async (request, response, next) => {
       order: [['id', 'DESC']],
     });
 
-    return response.json({
+    if (findAll.count === 0) {
+      return response.status(404).json({
+        message: 'Nenhum pedido cadastrado.',
+      });
+    }
+
+    return response.status(200).json({
       message: 'Listagem de todos os pedidos',
       findAll,
     });
@@ -211,7 +209,13 @@ const findAllPendingOrders = async (request, response, next) => {
       where: { status: 'costurando' },
     });
 
-    return response.json({
+    if (!findAll) {
+      return response.status(404).json({
+        message: 'Não foi encontrado nenhum pedido pendente.',
+      });
+    }
+
+    return response.status(200).json({
       message: 'Listagem de todos os pedidos',
       findAll,
     });
@@ -225,12 +229,12 @@ const findAllPendingOrders = async (request, response, next) => {
 
 const updateOrder = async (request, response, next) => {
   try {
+    const { id } = request.params;
     const fieldsFromBody = request.body;
 
-    const { id } = request.params;
     if (!id || isNaN(id)) {
-      return response.status(404).json({
-        message: `É necessário informar um id para poder atualizar um pedido.`,
+      return response.status(400).json({
+        message: `É necessário informar um id.`,
       });
     }
 
@@ -278,27 +282,27 @@ const updateOrder = async (request, response, next) => {
     }
 
     if (!findSegmentNameFromOrderID) {
-      return response.status(400).json({
+      return response.status(404).json({
         message: `O segmento '${findSegmentNameFromOrderID}' não foi encontrado.`,
       });
     }
     if (!findSegmentIDFromOrderID) {
-      return response.status(400).json({
+      return response.status(404).json({
         message: `O id ${findSegmentIDFromOrderID} do segmento '${findSegmentNameFromOrderID}' não foi encontrado.`,
       });
     }
     if (!findFactoryNameFromOrderID) {
-      return response.status(400).json({
+      return response.status(404).json({
         message: `A confecção '${findFactoryNameFromOrderID}' não foi encontrada.`,
       });
     }
     if (!findFactoryIDFromOrderID) {
-      return response.status(400).json({
+      return response.status(404).json({
         message: `O id ${findFactoryIDFromOrderID} da confecção '${findFactoryNameFromOrderID}' não foi encontrado.`,
       });
     }
     if (!findStatusFromOrderID) {
-      return response.status(400).json({
+      return response.status(404).json({
         message: `O status '${findStatusFromOrderID}' não foi encontrado.`,
       });
     }
@@ -439,8 +443,6 @@ const updateOrder = async (request, response, next) => {
     return response.status(500).json({
       message: 'Alguma coisa deu erro',
       errorMessage: error.message,
-      errorStack: error.stack,
-      errorStatus: error.status,
     });
   }
 };
@@ -450,11 +452,28 @@ const findOrderByID = async (request, response, next) => {
     const { id } = request.params;
     const order = await models.Orders.findByPk(id);
 
+    if (!id || isNaN(id)) {
+      return response.status(400).json({
+        message: `É necessário informar um id.`,
+      });
+    }
+
+    if (!order) {
+      return response.status(404).json({
+        message: `Pedido com id ${id} não foi encontrado.`,
+      });
+    }
+
     return response.json({
       message: 'Listagem de ordem por ID informado',
       order,
     });
-  } catch (error) {}
+  } catch (error) {
+    next(error);
+    return response.status(500).json({
+      error: error.message,
+    });
+  }
 };
 
 const deleteOrderByID = async (request, response, next) => {
@@ -462,14 +481,14 @@ const deleteOrderByID = async (request, response, next) => {
     const { id } = request.params;
     const order = await models.Orders.findByPk(id);
 
-    if (!id) {
+    if (!id || isNaN(id)) {
       return response.status(400).json({
-        message: 'Precisa informar id do pedido.',
+        message: `É necessário informar um id.`,
       });
     }
 
     if (!order) {
-      return response.status(400).json({
+      return response.status(404).json({
         message: `Não foi possível encontrar o pedido com id '${id}' informado. Confira o ID e tente novamente.`,
       });
     }
