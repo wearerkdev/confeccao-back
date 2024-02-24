@@ -105,6 +105,7 @@ const updateOneFactory = async (request, response, next) => {
   try {
     const { id } = request.params;
     const factory = await models.Factories.findByPk(id);
+    const fieldsFromBody = request.body;
 
     if (!id || isNaN(id)) {
       return response.status(400).json({
@@ -115,6 +116,24 @@ const updateOneFactory = async (request, response, next) => {
     if (!factory) {
       return response.status(404).json({
         message: `Confecção com id ${id} não foi encontrada.`,
+      });
+    }
+
+    if (fieldsFromBody?.phoneNumber && fieldsFromBody.phoneNumber.length > 11) {
+      return response.status(400).json({
+        message: 'Número de telefone não pode possuir mais que 11 dígitos',
+      });
+    }
+
+    if (
+      !Boolean(
+        fieldsFromBody?.isNumberWhatsapp &&
+          fieldsFromBody.isNumberWhatsapp !== typeof 'boolean',
+      )
+    ) {
+      return response.status(400).json({
+        message:
+          "O valor para 'Número é Whatsapp?' deve ser apenas 'sim' ou 'não'.",
       });
     }
 
