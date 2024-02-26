@@ -259,15 +259,15 @@ const updateOrder = async (request, response, next) => {
     const findIsDoneFromOrderID = order.dataValues.isDone;
 
     const validate_quantidadeDeSaida = Boolean(
-      fieldsFromBody.quantidadeDeSaida &&
-        (isNaN(fieldsFromBody.quantidadeDeSaida) ||
-          fieldsFromBody.quantidadeDeSaida) <= 0,
+      (fieldsFromBody.quantidadeDeSaida &&
+        isNaN(fieldsFromBody.quantidadeDeSaida)) ||
+        fieldsFromBody.quantidadeDeSaida < 0,
     );
 
     const validate_quantidadeDeRetorno = Boolean(
-      fieldsFromBody.quantidadeDeRetorno &&
-        (isNaN(fieldsFromBody.quantidadeDeRetorno) ||
-          fieldsFromBody.quantidadeDeRetorno) <= 0,
+      (fieldsFromBody.quantidadeDeRetorno &&
+        isNaN(fieldsFromBody.quantidadeDeRetorno)) ||
+        fieldsFromBody.quantidadeDeRetorno < 0,
     );
 
     if (validate_quantidadeDeSaida) {
@@ -275,7 +275,7 @@ const updateOrder = async (request, response, next) => {
         message: `O valor '${fieldsFromBody.quantidadeDeSaida}' informado para quantidade de saída deve ser um número positivo e maior que 0.`,
       });
     }
-    if (validate_quantidadeDeRetorno) {
+    if (validate_quantidadeDeRetorno < 0) {
       return response.status(400).json({
         message: `O valor '${fieldsFromBody.quantidadeDeRetorno}' informado para quantidade de retorno deve ser um número positivo e maior que 0.`,
       });
@@ -393,7 +393,7 @@ const updateOrder = async (request, response, next) => {
     }
 
     /**
-     * @description Se o campo 'quantidadeDeRetorno' for informado, o preço do pedido será atualizado
+     * @description Se APENAS o campo 'quantidadeDeRetorno' for informado, o preço do pedido será atualizado
      * de acordo com a quantidade de retorno informada.
      */
 
@@ -436,7 +436,8 @@ const updateOrder = async (request, response, next) => {
 
     return response.status(200).json({
       message: 'Dados do segmento foram atualizados',
-      updateOrder,
+
+      data,
     });
   } catch (error) {
     next(error);

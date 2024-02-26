@@ -4,7 +4,7 @@ const { gt } = Sequelize.Op;
 
 const findDone = async (request, response, next) => {
   try {
-    const totalOrdersPrice = await models.Orders.sum('orderPrice', {
+    const ordersDoneTotalPrice = await models.Orders.sum('orderPrice', {
       where: { isDone: true },
     });
 
@@ -23,30 +23,26 @@ const findDone = async (request, response, next) => {
       ]),
     });
 
-    if (!totalOrdersPrice) {
+    if (!ordersDoneTotalPrice || !finishedOrders) {
       return response.status(400).json({
         message:
-          'Erro ao somar os  valores das ordens em aberto. Favor entrar em contato com o suporte.',
+          'Não foi encontrado ao menos um pedido finalizado para poder continuar a operação. Se acha que isto seja um erro, entre em contato com o suporte.',
       });
     }
 
-    if (!finishedOrders) {
+    if (!ordersWith_pecasFaltantes.count === 0) {
       return response.status(400).json({
         message:
-          'Erro ao recuperar ordens em aberto. Favor entrar em contato  com o suporte.',
-      });
-    }
-    if (!ordersWith_pecasFaltantes) {
-      return response.status(400).json({
-        message:
-          'Erro ao pesquisar por peças a serem entregues. Favor entrar em contato com o suporte.',
+          'Não foi possível achar algum pedido com peças faltantes para poder continuar a operação. Se acha que isto seja um erro, entre em contato com o suporte.',
       });
     }
 
-    return response.json({
-      totalOrdersPrice,
+    return response.status(200).json({
+      ordersDoneTotalPrice: {
+        ordersDoneTotalPrice,
+        finishedOrders,
+      },
       ordersWith_pecasFaltantes,
-      finishedOrders,
     });
   } catch (error) {
     next(error);
