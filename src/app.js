@@ -7,7 +7,7 @@ const colors = require('colors');
 
 // Swagger
 const swaggerUI = require('swagger-ui-express');
-const swaggerJSON = require('./swagger/index.json');
+const swaggerJSON = require('../swagger/index.json');
 
 const app = express();
 colors.enable();

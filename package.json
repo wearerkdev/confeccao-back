@@ -22,7 +22,7 @@
     "docker:stop": "docker compose stop",
     "docker:start": "docker compose start",
     "docker:del": "docker system prune --all --volumes --force",
-    "docs": "swagger-cli bundle src/swagger/index.yaml --outfile src/swagger/index.json"
+    "docs": "swagger-cli bundle ./swagger/index.yaml --outfile ./swagger/index.json"
   },
   "dependencies": {
     "cors": "^2.8.5",
